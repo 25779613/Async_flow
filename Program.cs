@@ -9,7 +9,13 @@ namespace Async_Flow
         static async Task Main(string[] args)
         {
             Console.WriteLine("<<<<<<<<<<<<<<<<<<<<<< moving next within Pending Tasks>>>>>>>>>>>>>>>>>");
-            IAsyncEnumerable<int> IAsyncPendingTasks = pendingTask(1, 5);       
+            IAsyncEnumerator<int> asyncEnumerator = pendingTask(1, 5).GetAsyncEnumerator();       
+            
+            while(await asyncEnumerator.MoveNextAsync())
+            {
+                Console.WriteLine($"task being run: {(asyncEnumerator.Current)}");
+            }
+        
         }
 
         //pending tasks, running through a loop to complete tasks
