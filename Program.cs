@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Async_Flow
@@ -11,8 +12,14 @@ namespace Async_Flow
             Console.WriteLine("<<<<<<<<<<<<<<<<<<<<<< moving next within Pending Tasks>>>>>>>>>>>>>>>>>");
             // collection of tasks to be run one after another
             await runPendingtask();
+            //custom threads
             Console.WriteLine("<<<<<<<<<<<<<<<<<<<<<< Custom Tasks>>>>>>>>>>>>>>>>>");
-            await doJob1();
+            Thread thread = new Thread(new ThreadStart(thread1));
+            thread.Start();
+            await doJob2();
+            //multiple tasks
+            Console.WriteLine("<<<<<<<<<<<<<<<<<<<<<< Multiple Tasks>>>>>>>>>>>>>>>>>");
+            listOfTasks();
         }
 
 
@@ -52,7 +59,8 @@ namespace Async_Flow
             }
         }
 
-        //doing multiple tasks
+
+        //doing custom tasks
         static async Task doJob1()
         {
             await Task.Run(async () => {
@@ -64,15 +72,45 @@ namespace Async_Flow
 
             );
         }
+        //same method just using threading instead of task
         static async Task doJob2()
         {
-            await Task.Run(async () => {
-                await Task.Delay(1000);
+            await Task.Run( () => {
+                Thread.Sleep(1000);
                 Console.WriteLine("Go to vodacom");
-                await Task.Delay(2000);
+                Thread.Sleep(2000);
                 Console.WriteLine("Buy new phone");
             }
             );   
+        }
+
+        static void thread1()
+        {
+            Console.WriteLine("dont forget wallet");
+            Thread.Sleep(2000);
+        }
+
+        //list of tasks ,doing multiple tasks
+        public static void listOfTasks()
+        {
+            List<Task> tasks = new List<Task>();
+            tasks.Add(Task.Run(() =>
+            {
+                Thread.Sleep(1000);
+                Console.WriteLine("Go to vodacom");
+                Thread.Sleep(2000);
+                Console.WriteLine("Buy new phone");
+            }));
+            tasks.Add(Task.Run(async () =>
+            {
+                await Task.Delay(1000);
+                Console.WriteLine("Go to mall");
+                await Task.Delay(2000);
+                Console.WriteLine("Buy groceries");
+            }));
+
+            Task.WaitAll(tasks.ToArray());
+
         }
 
     }
